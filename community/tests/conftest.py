@@ -101,19 +101,32 @@ def service(dao):
 
 @pytest.fixture(scope='module')
 def client(request, mysql_container):
-    external_conf = None
+    external_conf = {
+        'TESTING': True,
+        'DEBUG': True,
+        'CACHE_TYPE': 'simple',
+        'CACHE_DEFAULT_TIMEOUT': 300
+    }
     if mysql_container is None:
-        external_conf = {
-            'SQLALCHEMY_DATABASE_URI': request.config.getoption('--fallback_db_uri'),
-            'TESTING': True,
-            'DEBUG': True,
-            'CACHE_TYPE': 'simple',
-            'CACHE_DEFAULT_TIMEOUT': 300
-        }
+        external_conf['SQLALCHEMY_DATABASE_URI'] = request.config.getoption('--fallback_db_uri')
+    else:
+        host_port = request.config.getoption('--host_port')
+        db_name = request.config.getoption('--db_name')
+        external_conf['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:@localhost:{host_port}/{db_name}'
     app = create_app(external_conf)
 
     db = IocContainer.db()
-    BaseModel.metadata.create_all(db.engine)
+
+    num_retries = request.config.getoption('--num_retries')
+    while num_retries > 0:
+        try:
+            BaseModel.metadata.create_all(db.engine)
+            break
+        except OperationalError as e:
+            num_retries -= 1
+            print(f"Waiting for engine init to complete...")
+            time.sleep(5)
+            pass
 
     db.session.add(User(username='jqpublic', name='John Q. Public'))
     db.session.add(User(username='jdoe', name='Jane Doe'))
@@ -123,3 +136,5 @@ def client(request, mysql_container):
         yield client
 
     BaseModel.metadata.drop_all(db.engine)
+    if mysql_container is not None:
+        mysql_container.stop()
