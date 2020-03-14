@@ -14,6 +14,11 @@ from community.api.flask import response
 
 
 def create_app(external_conf=None):
+    """
+
+    :param external_conf:
+    :return:
+    """
     if external_conf:
         if isinstance(external_conf, Dict):
             IocContainer.config.override(external_conf)
@@ -43,6 +48,7 @@ def create_app(external_conf=None):
     IocContainer.db_session.provided_by(providers.Object(IocContainer.db().session))
     IocContainer.community_dao.provided_by(providers.Singleton(CommunityDao, IocContainer.db_session, IocContainer.logger))
 
+    # Register views after CommunityService dependencies have been injected.
     from community.api.flask import views
     app.register_blueprint(views.user_api)
     app.register_blueprint(views.question_api)

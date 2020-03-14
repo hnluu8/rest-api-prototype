@@ -11,7 +11,7 @@ from community.service.community import CommunityService
 
 class IocContainer(containers.DeclarativeContainer):
     """
-
+        Define dependencies and inject them into data and service layers when creating Flask app.
     """
 
     config = providers.Configuration('config', default={

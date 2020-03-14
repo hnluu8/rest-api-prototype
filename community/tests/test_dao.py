@@ -2,6 +2,9 @@ from community.dao.community import CommunityDao
 
 
 class TestDao(object):
+    """
+        Test data layer.
+    """
     def test_create_question(self, dao: CommunityDao):
         asker = dao.get_user(1)
         question = dao.create_question(asker, "How do you keep the weight off?")

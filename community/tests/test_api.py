@@ -3,6 +3,9 @@ import simplejson as json
 
 
 class TestApi(object):
+    """
+        Use FlaskClient to test the REST API endpoints.
+    """
     def test_create_question(self, client: FlaskClient):
         resp = client.get('/api/v1/users/1')
         assert(resp.status_code == 200)

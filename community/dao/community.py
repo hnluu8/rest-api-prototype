@@ -5,7 +5,7 @@ from community.dao.models import *
 
 class CommunityDao:
     """
-
+        Data layer with reusable SQLAlchemy models.
     """
     def __init__(self, db_session: Session, logger):
         self.db_session = db_session

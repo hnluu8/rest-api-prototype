@@ -2,6 +2,9 @@ from community.service.community import CommunityService, PostType
 
 
 class TestService(object):
+    """
+        Test service layer.
+    """
     def test_create_question(self, service: CommunityService):
         asker = service.get_user(1)
         question = service.ask_question(asker.id, "How do you keep the weight off?")

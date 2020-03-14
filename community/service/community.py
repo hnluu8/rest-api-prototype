@@ -12,7 +12,7 @@ class PostType(Enum):
 
 class CommunityService:
     """
-
+        Service layer doesn't interact with the database directly only through the DAO.
     """
     def __init__(self, dao: CommunityDao, logger):
         self.dao = dao
